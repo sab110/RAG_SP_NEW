@@ -15,11 +15,19 @@ from openai import OpenAI
 
 load_dotenv()
 
-TENANT_ID = os.getenv("TENANT_ID")
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-SHAREPOINT_SITE = os.getenv("SITE_URL_NEW")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# TENANT_ID = os.getenv("TENANT_ID")
+# CLIENT_ID = os.getenv("CLIENT_ID")
+# CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+# SHAREPOINT_SITE = os.getenv("SITE_URL_NEW")
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+LLM_PROVIDER = os.environ["LLM_PROVIDER"]
+OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+TENANT_ID = os.environ["TENANT_ID"]
+CLIENT_ID = os.environ["CLIENT_ID"]
+CLIENT_SECRET = os.environ["CLIENT_SECRET"]
+SHAREPOINT_SITE = os.environ["SITE_URL_NEW"]
 PROCESSED_META_FILE = "processed_files.json"
 
 def get_access_token():
