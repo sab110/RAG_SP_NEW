@@ -3,6 +3,7 @@ name: 🔄 Run SharePoint Ingestion Every 15 Minutes
 on:
   schedule:
     - cron: '*/15 * * * *'  # every 15 minutes (UTC)
+  workflow_dispatch:
 
 jobs:
   ingest:
