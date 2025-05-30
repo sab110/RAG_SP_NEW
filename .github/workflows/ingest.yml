@@ -45,4 +45,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add chroma_db processed_files.json
           git diff --cached --quiet || git commit -m "🔄 Auto-update vector DB and metadata [CI]"
-          git push https://x-access-token:${{ secrets.SP_PUSH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          git push "https://x-access-token:${{ secrets.SP_PUSH_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
