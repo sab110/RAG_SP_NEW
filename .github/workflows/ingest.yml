@@ -2,8 +2,8 @@ name: 🔄 Run SharePoint Ingestion Every 15 Minutes
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # every 15 minutes (UTC)
-  workflow_dispatch:        # manual trigger
+    - cron: '*/15 * * * *'  # Every 15 minutes (UTC)
+  workflow_dispatch:
 
 jobs:
   ingest:
@@ -22,6 +22,9 @@ jobs:
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # Disable default token
+          fetch-depth: 0
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
@@ -36,18 +39,10 @@ jobs:
       - name: 🔁 Run ingestion script
         run: python create_vectordb3.py
 
-      - name: 📝 Configure Git
+      - name: 📤 Commit and Push updates
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'actions@github.com'
-
-      - name: 🕵️ Detect changes in ChromaDB or metadata
-        run: |
-          git add chroma_db/ processed_files.json || true
-          git diff --cached --quiet || echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
-
-      - name: 🚀 Commit and Push updates
-        if: env.CHANGES_DETECTED == 'true'
-        run: |
-          git commit -m "🔁 Auto-update vector DB and metadata [CI]"
-          git push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add chroma_db processed_files.json
+          git diff --cached --quiet || git commit -m "🔄 Auto-update vector DB and metadata [CI]"
+          git push https://x-access-token:${{ secrets.SP_PUSH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
