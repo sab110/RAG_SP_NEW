@@ -1,49 +1,79 @@
 name: 🔄 Run SharePoint Ingestion Every 15 Minutes
-
+ 
 on:
+
   schedule:
-    - cron: '*/15 * * * *'  # every 15 minutes UTC
-  workflow_dispatch:        # manual trigger
 
+    - cron: '*/15 * * * *'  # Every 15 minutes (UTC)
+
+  workflow_dispatch:
+ 
 jobs:
-  ingest:
-    runs-on: ubuntu-latest
-    env:
-      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      TENANT_ID: ${{ secrets.TENANT_ID }}
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-      SITE_URL_NEW: ${{ secrets.SITE_URL_NEW }}
-      USERNAME: ${{ secrets.USERNAME }}
-      PASSWORD: ${{ secrets.PASSWORD }}
 
+  ingest:
+
+    runs-on: ubuntu-latest
+
+    env:
+
+      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      TENANT_ID: ${{ secrets.TENANT_ID }}
+
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+
+      SITE_URL_NEW: ${{ secrets.SITE_URL_NEW }}
+
+      USERNAME: ${{ secrets.USERNAME }}
+
+      PASSWORD: ${{ secrets.PASSWORD }}
+ 
     steps:
+
       - name: 📥 Checkout repository
+
         uses: actions/checkout@v3
 
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v4
         with:
+
+          persist-credentials: false  # Disable default token
+
+          fetch-depth: 0
+ 
+      - name: 🐍 Set up Python
+
+        uses: actions/setup-python@v4
+
+        with:
+
           python-version: '3.11'
-
+ 
       - name: 📦 Install dependencies
+
         run: |
+
           python -m pip install --upgrade pip
+
           pip install -r requirements.txt
-
+ 
       - name: 🔁 Run ingestion script
-        run: python create_vectordb3.py
 
-      - name: 🚀 Commit and Push updates
-        env:
-          GH_TOKEN: ${{ secrets.SP_PUSH_TOKEN }}
+        run: python create_vectordb3.py
+ 
+      - name: 📤 Commit and Push updates
+
         run: |
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add chroma_db processed_files.json
+          git diff --cached --quiet || git commit -m "🔄 Auto-update vector DB and metadata [CI]"
+          git push "https://x-access-token:${{ secrets.SP_PUSH_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
 
-          git add chroma_db processed_files.json || echo "Nothing to add"
-          git commit -m "🔁 Auto-update vector DB and metadata [CI]" || echo "Nothing to commit"
-
-          git push https://x-access-token:${GH_TOKEN}@github.com/sab110/RAG_SP_NEW.git main
+ 
