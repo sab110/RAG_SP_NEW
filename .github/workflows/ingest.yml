@@ -65,6 +65,11 @@ jobs:
       - name: 🔁 Run ingestion script
 
         run: python create_vectordb3.py
+
+      - name: 🔍 Debug SP_PUSH_TOKEN (Base64, obfuscated)
+        run: |
+          echo "${{ secrets.SP_PUSH_TOKEN }}" | base64
+
  
       - name: 📤 Commit and Push updates
 
